@@ -1,17 +1,22 @@
 import React, { Component } from 'react'
 import { Mutation } from 'react-apollo'
 import gql from 'graphql-tag'
+import PropTypes from 'prop-types'
 import Form from './styles/Form'
 import Error from './ErrorMessage'
 import { CURRENT_USER_QUERY } from './User'
 
-const SIGNUP_MUTATION = gql`
-    mutation SIGNUP_MUTATION(
-        $email: String!
-        $name: String!
+const RESET_MUTATION = gql`
+    mutation RESET_MUTATION(
+        $resetToken: String!
         $password: String!
+        $confirmPassword: String!
     ) {
-        signup(email: $email, name: $name, password: $password) {
+        resetPassword(
+            resetToken: $resetToken
+            password: $password
+            confirmPassword: $confirmPassword
+        ) {
             id
             email
             name
@@ -19,11 +24,13 @@ const SIGNUP_MUTATION = gql`
     }
 `
 
-class Signup extends Component {
+class Reset extends Component {
+    static propTypes = {
+        resetToken: PropTypes.string.isRequired,
+    }
     state = {
-        name: '',
-        email: '',
         password: '',
+        confirmPassword: '',
     }
     saveToState = e => {
         this.setState({ [e.target.name]: e.target.value })
@@ -31,46 +38,29 @@ class Signup extends Component {
     render() {
         return (
             <Mutation
-                mutation={SIGNUP_MUTATION}
-                variables={this.state}
+                mutation={RESET_MUTATION}
+                variables={{
+                    resetToken: this.props.resetToken,
+                    password: this.state.password,
+                    confirmPassword: this.state.confirmPassword,
+                }}
                 refetchQueries={[{ query: CURRENT_USER_QUERY }]}
             >
-                {(signup, { error, loading }) => (
+                {(reset, { error, loading, called }) => (
                     <Form
                         method="post"
                         onSubmit={async e => {
                             e.preventDefault()
-                            await signup()
+                            await reset()
                             this.setState({
-                                name: '',
-                                email: '',
                                 password: '',
+                                confirmPassword: '',
                             })
                         }}
                     >
                         <fieldset disabled={loading} aria-busy={loading}>
-                            <h2>Sign up for an account</h2>
+                            <h2>Reset your password</h2>
                             <Error error={error} />
-                            <label htmlFor="email">
-                                Email
-                                <input
-                                    type="email"
-                                    name="email"
-                                    placeholder="email"
-                                    value={this.state.email}
-                                    onChange={this.saveToState}
-                                />
-                            </label>
-                            <label htmlFor="name">
-                                Name
-                                <input
-                                    type="text"
-                                    name="name"
-                                    placeholder="name"
-                                    value={this.state.name}
-                                    onChange={this.saveToState}
-                                />
-                            </label>
                             <label htmlFor="password">
                                 Password
                                 <input
@@ -81,8 +71,18 @@ class Signup extends Component {
                                     onChange={this.saveToState}
                                 />
                             </label>
+                            <label htmlFor="confirmPassword">
+                                Confirm Password
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    placeholder="confirmPassword"
+                                    value={this.state.confirmPassword}
+                                    onChange={this.saveToState}
+                                />
+                            </label>
 
-                            <button type="submit">Sign Up!</button>
+                            <button type="submit">Reset Password!</button>
                         </fieldset>
                     </Form>
                 )}
@@ -91,4 +91,4 @@ class Signup extends Component {
     }
 }
 
-export default Signup
+export default Reset
