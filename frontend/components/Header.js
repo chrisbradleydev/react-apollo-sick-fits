@@ -1,19 +1,20 @@
 import Link from 'next/link'
-import Router from 'next/router'
 import styled from 'styled-components'
 import NProgress from 'nprogress'
+import Router from 'next/router'
 import Nav from './Nav'
+import Cart from './Cart'
 
 Router.onRouteChangeStart = () => {
-  NProgress.start()
+    NProgress.start()
 }
 
 Router.onRouteChangeComplete = () => {
-  NProgress.done()
+    NProgress.done()
 }
 
 Router.onRouteChangeError = () => {
-  NProgress.done()
+    NProgress.done()
 }
 
 const Logo = styled.h1`
@@ -67,7 +68,7 @@ const Header = () => (
         <div className="sub-bar">
             <p>Search</p>
         </div>
-        <div>Cart</div>
+        <Cart />
     </StyledHeader>
 )
 
