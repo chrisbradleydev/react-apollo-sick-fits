@@ -8,11 +8,11 @@ import Error from './ErrorMessage'
 
 const CREATE_ITEM_MUTATION = gql`
     mutation CREATE_ITEM_MUTATION(
-            $title: String!
-            $description: String!
-            $price: Int!
-            $image: String
-            $largeImage: String
+        $title: String!
+        $description: String!
+        $price: Int!
+        $image: String
+        $largeImage: String
     ) {
         createItem(
             title: $title
@@ -32,7 +32,7 @@ class CreateItem extends Component {
         description: '',
         image: '',
         largeImage: '',
-        price: '',
+        price: 0,
     }
 
     handleChange = e => {
@@ -47,10 +47,13 @@ class CreateItem extends Component {
         data.append('file', files[0])
         data.append('upload_preset', 'sickfits')
 
-        const res = await fetch('https://api.cloudinary.com/v1_1/ctbradley/image/upload', {
-            method: 'POST',
-            body: data,
-        })
+        const res = await fetch(
+            'https://api.cloudinary.com/v1_1/ctbradley/image/upload',
+            {
+                method: 'POST',
+                body: data,
+            }
+        )
         const file = await res.json()
 
         this.setState({
@@ -63,14 +66,17 @@ class CreateItem extends Component {
         return (
             <Mutation mutation={CREATE_ITEM_MUTATION} variables={this.state}>
                 {(createItem, { loading, error }) => (
-                    <Form onSubmit={async e => {
-                        e.preventDefault()
-                        const res = await createItem()
-                        Router.push({
-                            pathname: '/item',
-                            query: { id: res.data.createItem.id },
-                        })
-                    }}>
+                    <Form
+                        data-test="form"
+                        onSubmit={async e => {
+                            e.preventDefault()
+                            const res = await createItem()
+                            Router.push({
+                                pathname: '/item',
+                                query: { id: res.data.createItem.id },
+                            })
+                        }}
+                    >
                         <Error error={error} />
                         <fieldset disabled={loading} aria-busy={loading}>
                             <label htmlFor="file">
@@ -84,7 +90,11 @@ class CreateItem extends Component {
                                     required
                                 />
                                 {this.state.image && (
-                                    <img width="200" src={this.state.image} alt="Upload Preview" />
+                                    <img
+                                        width="200"
+                                        src={this.state.image}
+                                        alt="Upload Preview"
+                                    />
                                 )}
                             </label>
 
@@ -97,7 +107,8 @@ class CreateItem extends Component {
                                     placeholder="Title"
                                     value={this.state.title}
                                     onChange={this.handleChange}
-                                    required />
+                                    required
+                                />
                             </label>
 
                             <label htmlFor="price">
@@ -109,7 +120,8 @@ class CreateItem extends Component {
                                     placeholder="Price"
                                     value={this.state.price}
                                     onChange={this.handleChange}
-                                    required />
+                                    required
+                                />
                             </label>
 
                             <label htmlFor="description">
@@ -121,7 +133,8 @@ class CreateItem extends Component {
                                     placeholder="Enter a description"
                                     value={this.state.description}
                                     onChange={this.handleChange}
-                                    required />
+                                    required
+                                />
                             </label>
 
                             <button type="submit">Submit</button>
